@@ -1,0 +1,123 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>
+      Intro to MapView - Create a 2D map | Sample | ArcGIS API for JavaScript
+      4.23
+    </title>
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.23/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.23/"></script>
+
+    <script>
+      require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/layers/FeatureLayer",
+        "esri/layers/TileLayer",
+        "esri/widgets/Legend",
+        "esri/widgets/ScaleBar",
+        "esri/widgets/Search",
+        "esri/widgets/LayerList",
+        "esri/widgets/BasemapGallery",
+        "esri/request"
+      ], (
+        Map,
+        MapView,
+        FeatureLayer,
+        TileLayer,
+        Legend,
+        ScaleBar,
+        Search,
+        LayerList,
+        BasemapGallery,
+        esriRequest
+      ) => {
+        const flayer = new FeatureLayer({
+          url: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer/0"
+        });
+        const tiledlayer = new TileLayer({
+          url: "https://www.geosceneonline.cn/server/rest/services/Hosted/切片0405/MapServer"
+        });
+        const map1 = new Map({
+          basemap: "topo-vector"
+          // layers:[flayer,tiledlayer]
+        });
+        //map1.layers.add(flayer);
+        map1.addMany([flayer, tiledlayer]);
+        const view = new MapView({
+          container: "viewDiv",
+          map: map1,
+          zoom: 4,
+          center: [270, 40] // longitude, latitude
+        });
+        // typical usage
+        let legend = new Legend({
+          view: view
+        });
+        view.ui.add(legend, "bottom-right");
+        let scaleBar = new ScaleBar({
+          view: view
+        });
+        // Add widget to the bottom left corner of the view
+        view.ui.add(scaleBar, {
+          position: "bottom-left"
+        });
+        const searchWidget = new Search({
+          view: view
+        });
+        // Adds the search widget below other elements in
+        // the top left corner of the view
+        view.ui.add(searchWidget, {
+          position: "top-left",
+          index: 2
+        });
+        let layerList = new LayerList({
+          view: view
+        });
+        // Adds widget below other elements in the top left corner of the view
+        view.ui.add(layerList, {
+          position: "top-left"
+        });
+        let basemapGallery = new BasemapGallery({
+          view: view
+        });
+        // Add widget to the top right corner of the view
+        view.ui.add(basemapGallery, {
+          position: "top-right"
+        });
+        // request GeoJson data from USGS remote server
+        let url =
+          "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson";
+
+        esriRequest(url, {
+          responseType: "json"
+        }).then(function (response) {
+          // The requested data
+          let geoJson = response.data;
+        });
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+</html>
